@@ -467,6 +467,14 @@ const CONFIG={
 };
 /* ========================================================= */
 
+const SUPABASE_URL = 'https://czqijodfoidzejgwblrf.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_MQXhkfcmpYCNbetVDR-ARw_yUoUkNmK';
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
 const $=id=>document.getElementById(id);
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 document.querySelectorAll('[data-name]').forEach(e=>e.textContent=CONFIG.name);
