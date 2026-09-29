@@ -435,6 +435,8 @@ h2{font-size:clamp(2rem,6.6vw,3.5rem)}
 
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
 <script>
 (()=>{
 'use strict';
@@ -641,20 +643,59 @@ $('blowBtn').addEventListener('click',()=>{
 });
 
 /* ---------- 3 · wish ---------- */
-function sendWish(){
-  const v=$('wishIn').value.trim();
-  if(!v){$('wishIn').focus();return}
+async function sendWish(){
+  const v = $('wishIn').value.trim();
+
+  if(!v){
+    $('wishIn').focus();
+    return;
+  }
+
   ac();
-  const l=document.createElement('div');l.className='lantern';l.textContent=v;
-  $('wishPage').appendChild(l);setTimeout(()=>l.remove(),7500);
-  $('wishForm').hidden=true;
-  $('wishText').textContent="Sent. Nobody saw it but you. Now it's up to the universe.";
-  chime(880);tone(1320,.15,.6,'sine',.03);
-  setTimeout(()=>{$('wishNext').hidden=false},1600);
+
+  // Save wish to Supabase
+  const { error } = await supabaseClient
+    .from('birthday_wishes')
+    .insert({ wish: v });
+
+  if(error){
+    console.error('Wish save failed:', error);
+    $('wishText').textContent = 'Something went wrong. Please try again.';
+    return;
+  }
+
+  // Keep your existing lantern animation
+  const l = document.createElement('div');
+  l.className = 'lantern';
+  l.textContent = v;
+
+  $('wishPage').appendChild(l);
+  setTimeout(() => l.remove(), 7500);
+
+  // Hide form after sending
+  $('wishForm').hidden = true;
+
+  $('wishText').textContent =
+    "Type it below and send your wish into the sky. ✨";
+
+  chime(880);
+  tone(1320,.15,.6,'sine',.03);
+
+  setTimeout(() => {
+    $('wishNext').hidden = false;
+  }, 1600);
 }
-$('wishGo').addEventListener('click',sendWish);
-$('wishIn').addEventListener('keydown',e=>{if(e.key==='Enter')sendWish()});
-enter[2]=()=>{if(!$('wishForm').hidden)setTimeout(()=>$('wishIn').focus({preventScroll:true}),800)};
+
+
+
+$('wishGo').addEventListener('click', sendWish);
+
+$('wishIn').addEventListener('keydown', e => {
+  if(e.key === 'Enter') sendWish();
+});
+
+
+
 
 /* ---------- 4 · garden ---------- */
 {
